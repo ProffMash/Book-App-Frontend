@@ -1,5 +1,6 @@
 // src/api/api.ts
-import axios from 'axios';
+// import axios from 'axios';
+import axiosInstance from "./router";
 
 // Define Book interface
 interface Book {
@@ -9,12 +10,12 @@ interface Book {
   year: number;
 }
 
-const axiosInstance = axios.create({
-  baseURL: "https://bookapprepobackend.onrender.com", // Replace with your API base URL
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+// const axiosInstance = axios.create({
+//   baseURL: "https://bookapprepobackend.onrender.com", // Replace with your API base URL
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
 
 export const getBooks = async (): Promise<Book[]> => {
   const response = await axiosInstance.get<Book[]>('/books');
