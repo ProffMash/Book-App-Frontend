@@ -180,7 +180,7 @@ const Pagination = ({ booksPerPage, totalBooks, paginate }: PaginationProps) => 
   );
 };
 
-//SearchBar component
+// SearchBar component
 const SearchBar = ({ setSearchTerm }: { setSearchTerm: (term: string) => void }) => {
   const [input, setInput] = useState('');
 
