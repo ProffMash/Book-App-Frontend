@@ -1,9 +1,9 @@
-// src/App.tsx
 import React, { useReducer, useEffect, useState, useRef } from 'react';
 import './App.scss';
 import { getBooks, createBook, updateBook, deleteBook } from './api/api';
+import { HashLoader } from 'react-spinners';
 
-// Define Book interface
+//Book interface
 interface Book {
   id: string;
   title: string;
@@ -11,10 +11,10 @@ interface Book {
   year: number;
 }
 
-// Initial state
+//Initial state
 const initialBooks: Book[] = [];
 
-// Reducer function
+//Reducer function
 type ActionType =
   | { type: 'ADD_BOOK'; payload: Book }
   | { type: 'UPDATE_BOOK'; payload: Book }
@@ -36,7 +36,7 @@ function bookReducer(state: Book[], action: ActionType): Book[] {
   }
 }
 
-// BookForm component
+//BookForm component
 const BookForm = ({
   addBook,
   editBook,
@@ -69,13 +69,13 @@ const BookForm = ({
       year: parseInt(yearRef.current?.value || '0', 10),
     };
 
-    // Validate ID format
+    //Validate ID format
     if (!/^[A-Za-z]{2}\d{2}$/.test(newBook.id)) {
       alert('ID must be in the format XX00 (e.g., ED01).');
       return;
     }
 
-    // Validate other fields
+    //Validate other fields
     if (!newBook.title || !newBook.author || !newBook.year) {
       alert('Please fill out all fields.');
       return;
@@ -87,7 +87,7 @@ const BookForm = ({
       addBook(newBook);
     }
 
-    // Clear inputs
+    //Clear inputs
     idRef.current!.value = '';
     titleRef.current!.value = '';
     authorRef.current!.value = '';
@@ -114,7 +114,7 @@ const BookForm = ({
   );
 };
 
-// BookTable component
+//BookTable component
 interface BookTableProps {
   books: Book[];
   editBook: (book: Book) => void;
@@ -151,7 +151,7 @@ const BookTable = ({ books, editBook, deleteBook }: BookTableProps) => {
   );
 };
 
-// Pagination component
+//Pagination component
 interface PaginationProps {
   booksPerPage: number;
   totalBooks: number;
@@ -180,7 +180,7 @@ const Pagination = ({ booksPerPage, totalBooks, paginate }: PaginationProps) => 
   );
 };
 
-// SearchBar component
+//SearchBar component
 const SearchBar = ({ setSearchTerm }: { setSearchTerm: (term: string) => void }) => {
   const [input, setInput] = useState('');
 
@@ -199,22 +199,26 @@ const SearchBar = ({ setSearchTerm }: { setSearchTerm: (term: string) => void })
   );
 };
 
-// Main App component
+//Main App component
 const App = () => {
   const [books, dispatch] = useReducer(bookReducer, initialBooks);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [loading, setLoading] = useState(true); 
 
   const booksPerPage = 5;
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
+        setLoading(true); 
         const books = await getBooks();
         dispatch({ type: 'LOAD_BOOKS', payload: books });
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false); 
       }
     };
     fetchBooks();
@@ -267,8 +271,14 @@ const App = () => {
         <h1>Book Repository</h1>
         <SearchBar setSearchTerm={setSearchTerm} />
         <BookForm addBook={addBook} editBook={updateBookDetails} editingBook={editingBook} />
-        <BookTable books={filteredBooks} editBook={editBook} deleteBook={deleteBookById} />
-        <Pagination booksPerPage={booksPerPage} totalBooks={books.length} paginate={paginate} />
+        {loading ? ( 
+          <HashLoader />
+        ) : (
+          <>
+            <BookTable books={filteredBooks} editBook={editBook} deleteBook={deleteBookById} />
+            <Pagination booksPerPage={booksPerPage} totalBooks={books.length} paginate={paginate} />
+          </>
+        )}
       </div>
     </div>
   );
